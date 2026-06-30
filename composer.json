@@ -1,6 +1,6 @@
 {
     "name": "phpdot/logs",
-    "description": "The phpdot observability engine: distributed tracing runtime, per-coroutine scope management, and W3C Trace Context value objects. Backend-agnostic; sinks are peer packages.",
+    "description": "The phpdot observability engine: distributed tracing runtime, per-coroutine scope management, and W3C Trace Context value objects. Backend-agnostic; writers are peer packages.",
     "type": "library",
     "license": "MIT",
     "authors": [
