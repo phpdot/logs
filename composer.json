@@ -1,0 +1,48 @@
+{
+    "name": "phpdot/logs",
+    "description": "The phpdot observability engine: distributed tracing runtime, per-coroutine scope management, and W3C Trace Context value objects. Backend-agnostic; sinks are peer packages.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Omar Hamdan",
+            "email": "omar@phpdot.com"
+        }
+    ],
+    "keywords": ["observability", "tracing", "spans", "w3c-trace-context", "logging", "swoole", "coroutine"],
+    "require": {
+        "php": ">=8.4",
+        "phpdot/contracts": "^1.9",
+        "phpdot/container": "^1.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.94",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPdot\\Logs\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PHPdot\\Logs\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=256M",
+        "cs-fix": "php-cs-fixer fix",
+        "cs-check": "php-cs-fixer fix --dry-run --diff",
+        "check": [
+            "@test",
+            "@analyse",
+            "@cs-check"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
