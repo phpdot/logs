@@ -444,6 +444,36 @@ final class CoreTracerTest extends TestCase
     }
 
     // ---------------------------------------------------------------------
+    // secure() — per-record sensitive marking (encrypted by the backend)
+    // ---------------------------------------------------------------------
+
+    #[Test]
+    public function secureMarksTheLogRecordSoTheBackendEncryptsIt(): void
+    {
+        $writer = $this->writer();
+        $tracer = new CoreTracer($this->scope(), $writer);
+
+        $tracer->error('SSN 123-45-6789', ['card' => '4111'])->secure();
+
+        $logs = $this->logsIn($writer->records);
+        self::assertCount(1, $logs);
+        self::assertTrue($logs[0]['secure']);
+    }
+
+    #[Test]
+    public function aLogWithoutSecureCarriesNoSecureFlag(): void
+    {
+        $writer = $this->writer();
+        $tracer = new CoreTracer($this->scope(), $writer);
+
+        $tracer->info('GET /orders', ['status' => 200]);
+
+        $logs = $this->logsIn($writer->records);
+        self::assertCount(1, $logs);
+        self::assertArrayNotHasKey('secure', $logs[0]);
+    }
+
+    // ---------------------------------------------------------------------
     // Fixtures — real engine collaborators + an inline capturing writer.
     // ---------------------------------------------------------------------
 

@@ -15,6 +15,7 @@ use Closure;
 use PHPdot\Contracts\Container\ContextDestroyInterface;
 use PHPdot\Contracts\Container\ContextInterface;
 use PHPdot\Contracts\Container\ContextProviderInterface;
+use PHPdot\Contracts\Logs\PendingLogInterface;
 use PHPdot\Contracts\Logs\SpanContextInterface;
 use PHPdot\Contracts\Logs\SpanInterface;
 use PHPdot\Contracts\Logs\WriterInterface;
@@ -615,24 +616,34 @@ final class ScopeManagerTest extends TestCase
                 throw new \LogicException('fake span has no trace identity');
             }
 
-            public function debug(string $message, array $context = []): static
+            public function debug(string $message, array $context = []): PendingLogInterface
             {
-                return $this;
+                return $this->pendingNoop();
             }
 
-            public function info(string $message, array $context = []): static
+            public function info(string $message, array $context = []): PendingLogInterface
             {
-                return $this;
+                return $this->pendingNoop();
             }
 
-            public function warning(string $message, array $context = []): static
+            public function warning(string $message, array $context = []): PendingLogInterface
             {
-                return $this;
+                return $this->pendingNoop();
             }
 
-            public function error(string $message, array $context = []): static
+            public function error(string $message, array $context = []): PendingLogInterface
             {
-                return $this;
+                return $this->pendingNoop();
+            }
+
+            private function pendingNoop(): PendingLogInterface
+            {
+                return new class implements PendingLogInterface {
+                    public function secure(): static
+                    {
+                        return $this;
+                    }
+                };
             }
 
             public function end(): void

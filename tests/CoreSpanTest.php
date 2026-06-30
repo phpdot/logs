@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace PHPdot\Logs\Tests;
 
+use PHPdot\Contracts\Logs\PendingLogInterface;
 use PHPdot\Contracts\Logs\ScopeManagerInterface;
 use PHPdot\Contracts\Logs\SpanContextInterface;
 use PHPdot\Contracts\Logs\SpanInterface;
@@ -134,14 +135,14 @@ final class CoreSpanTest extends TestCase
     }
 
     #[Test]
-    public function logMethodsReturnSameInstance(): void
+    public function logMethodsReturnAPendingLogHandle(): void
     {
         $span = $this->makeSpan($this->capturingWriter(), $this->recordingScope());
 
-        self::assertSame($span, $span->debug('d'));
-        self::assertSame($span, $span->info('i'));
-        self::assertSame($span, $span->warning('w'));
-        self::assertSame($span, $span->error('e'));
+        self::assertInstanceOf(PendingLogInterface::class, $span->debug('d'));
+        self::assertInstanceOf(PendingLogInterface::class, $span->info('i'));
+        self::assertInstanceOf(PendingLogInterface::class, $span->warning('w'));
+        self::assertInstanceOf(PendingLogInterface::class, $span->error('e'));
     }
 
     #[Test]
@@ -152,8 +153,7 @@ final class CoreSpanTest extends TestCase
         $result = $span
             ->setAttribute('a', 1)
             ->addEvent('e')
-            ->setStatus('ok')
-            ->info('hello');
+            ->setStatus('ok');
 
         self::assertSame($span, $result);
     }

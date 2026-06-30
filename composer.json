@@ -12,7 +12,7 @@
     "keywords": ["observability", "tracing", "spans", "w3c-trace-context", "logging", "swoole", "coroutine"],
     "require": {
         "php": ">=8.4",
-        "phpdot/contracts": "^1.9",
+        "phpdot/contracts": "^1.10",
         "phpdot/container": "^1.0"
     },
     "require-dev": {

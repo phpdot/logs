@@ -23,6 +23,7 @@ namespace PHPdot\Logs;
 
 use PHPdot\Container\Attribute\Binds;
 use PHPdot\Container\Attribute\Singleton;
+use PHPdot\Contracts\Logs\PendingLogInterface;
 use PHPdot\Contracts\Logs\ScopeManagerInterface;
 use PHPdot\Contracts\Logs\SpanContextInterface;
 use PHPdot\Contracts\Logs\SpanInterface;
@@ -116,46 +117,47 @@ final class CoreTracer implements TracerInterface
     /**
      * @param array<string, mixed> $context
      */
-    public function debug(string $message, array $context = []): void
+    public function debug(string $message, array $context = []): PendingLogInterface
     {
-        $this->writeLog('debug', $message, $context);
+        return $this->writeLog('debug', $message, $context);
     }
 
     /**
      * @param array<string, mixed> $context
      */
-    public function info(string $message, array $context = []): void
+    public function info(string $message, array $context = []): PendingLogInterface
     {
-        $this->writeLog('info', $message, $context);
+        return $this->writeLog('info', $message, $context);
     }
 
     /**
      * @param array<string, mixed> $context
      */
-    public function warning(string $message, array $context = []): void
+    public function warning(string $message, array $context = []): PendingLogInterface
     {
-        $this->writeLog('warning', $message, $context);
+        return $this->writeLog('warning', $message, $context);
     }
 
     /**
      * @param array<string, mixed> $context
      */
-    public function error(string $message, array $context = []): void
+    public function error(string $message, array $context = []): PendingLogInterface
     {
-        $this->writeLog('error', $message, $context);
+        return $this->writeLog('error', $message, $context);
     }
 
     /**
-     * Build and export a log record on this tracer's channel, correlated to the
-     * current span's identity.
+     * Build a log record on this tracer's channel, correlated to the current
+     * span's identity, as a deferred handle: it is written when the handle is
+     * released (end of statement) so the caller can secure() it first.
      *
      * @param array<string, mixed> $context
      */
-    private function writeLog(string $level, string $message, array $context): void
+    private function writeLog(string $level, string $message, array $context): PendingLog
     {
         $identity = $this->current()->context();
 
-        $this->writer->write([
+        return new PendingLog($this->writer, [
             'type'      => 'log',
             'level'     => $level,
             'message'   => $message,

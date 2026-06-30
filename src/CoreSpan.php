@@ -21,6 +21,7 @@ declare(strict_types=1);
 
 namespace PHPdot\Logs;
 
+use PHPdot\Contracts\Logs\PendingLogInterface;
 use PHPdot\Contracts\Logs\ScopeManagerInterface;
 use PHPdot\Contracts\Logs\SpanContextInterface;
 use PHPdot\Contracts\Logs\SpanInterface;
@@ -97,7 +98,7 @@ final class CoreSpan implements SpanInterface
     /**
      * @param array<string, mixed> $context
      */
-    public function debug(string $message, array $context = []): static
+    public function debug(string $message, array $context = []): PendingLogInterface
     {
         return $this->log('debug', $message, $context);
     }
@@ -105,7 +106,7 @@ final class CoreSpan implements SpanInterface
     /**
      * @param array<string, mixed> $context
      */
-    public function info(string $message, array $context = []): static
+    public function info(string $message, array $context = []): PendingLogInterface
     {
         return $this->log('info', $message, $context);
     }
@@ -113,7 +114,7 @@ final class CoreSpan implements SpanInterface
     /**
      * @param array<string, mixed> $context
      */
-    public function warning(string $message, array $context = []): static
+    public function warning(string $message, array $context = []): PendingLogInterface
     {
         return $this->log('warning', $message, $context);
     }
@@ -121,7 +122,7 @@ final class CoreSpan implements SpanInterface
     /**
      * @param array<string, mixed> $context
      */
-    public function error(string $message, array $context = []): static
+    public function error(string $message, array $context = []): PendingLogInterface
     {
         return $this->log('error', $message, $context);
     }
@@ -160,9 +161,9 @@ final class CoreSpan implements SpanInterface
      *
      * @param array<string, mixed> $context
      */
-    private function log(string $level, string $message, array $context): static
+    private function log(string $level, string $message, array $context): PendingLog
     {
-        $this->writer->write([
+        return new PendingLog($this->writer, [
             'type'      => 'log',
             'level'     => $level,
             'message'   => $message,
@@ -172,7 +173,5 @@ final class CoreSpan implements SpanInterface
             'timestamp' => microtime(true),
             'context'   => $context,
         ]);
-
-        return $this;
     }
 }
