@@ -47,12 +47,20 @@ final class SpanStack
     /**
      * Remove a span by identity, tolerating out-of-order ends.
      *
+     * The root frame (index 0) is protected — only {@see drain()} removes it at
+     * the request/coroutine boundary — so a stray `deactivate()` of the root is a
+     * no-op and `current()` keeps reporting the request root.
+     *
      * @param SpanInterface $span The span to remove.
      */
     public function remove(SpanInterface $span): void
     {
         foreach ($this->spans as $index => $active) {
             if ($active === $span) {
+                if ($index === 0) {
+                    return;
+                }
+
                 array_splice($this->spans, $index, 1);
 
                 return;

@@ -66,7 +66,7 @@ final class SpanId
     {
         $hex = strtolower($hex);
 
-        if (preg_match('/^[0-9a-f]{16}$/', $hex) !== 1 || $hex === self::ZERO) {
+        if (preg_match('/^[0-9a-f]{16}\z/', $hex) !== 1 || $hex === self::ZERO) {
             throw InvalidIdentifierException::spanId($hex);
         }
 

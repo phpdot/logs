@@ -58,7 +58,7 @@ final class TraceId
     {
         $hex = strtolower(str_replace('-', '', $id));
 
-        if (preg_match('/^[0-9a-f]{32}$/', $hex) !== 1 || $hex === str_repeat('0', 32)) {
+        if (preg_match('/^[0-9a-f]{32}\z/', $hex) !== 1 || $hex === str_repeat('0', 32)) {
             throw InvalidIdentifierException::traceId($id);
         }
 
