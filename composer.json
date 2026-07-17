@@ -1,0 +1,61 @@
+{
+    "name": "phpdot/logs",
+    "description": "Tracer, span, and pending-log core implementing the contracts observability boundary.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Omar Hamdan",
+            "email": "omar@phpdot.com"
+        }
+    ],
+    "keywords": [
+        "logs",
+        "tracing",
+        "spans",
+        "observability",
+        "swoole"
+    ],
+    "require": {
+        "php": ">=8.5",
+        "phpdot/container": "^0.1",
+        "phpdot/contracts": "^0.1"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.94",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpunit/phpunit": "^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPdot\\Logs\\": "src/"
+        },
+        "files": [
+            "src/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PHPdot\\Logs\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse --memory-limit=256M",
+        "cs-fix": "php-cs-fixer fix",
+        "cs-check": "php-cs-fixer fix --dry-run --diff",
+        "check": [
+            "@test",
+            "@analyse",
+            "@cs-check"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "support": {
+        "source": "https://github.com/phpdot/logs",
+        "issues": "https://github.com/phpdot/monorepo/issues"
+    }
+}
