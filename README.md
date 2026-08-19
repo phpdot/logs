@@ -26,8 +26,8 @@ A package holds **one** object — `TracerInterface` — and logs and opens span
 | Requirement | Constraint |
 |---|---|
 | PHP | `>= 8.5` |
-| `phpdot/contracts` | `^0.1` |
-| `phpdot/container` | `^0.1` |
+| `phpdot/contracts` | `^0.2` |
+| `phpdot/container` | `^0.2` |
 
 ## Installation
 
