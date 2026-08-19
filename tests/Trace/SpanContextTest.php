@@ -228,7 +228,7 @@ final class SpanContextTest extends TestCase
                 return 'b7ad6b7169203331';
             }
 
-            public function parentSpanId(): ?string
+            public function parentSpanId(): null|string
             {
                 return null;
             }
@@ -266,7 +266,7 @@ final class SpanContextTest extends TestCase
                 return 'B7AD6B7169203331';
             }
 
-            public function parentSpanId(): ?string
+            public function parentSpanId(): null|string
             {
                 return null;
             }
@@ -302,7 +302,7 @@ final class SpanContextTest extends TestCase
                 return 'b7ad6b7169203331';
             }
 
-            public function parentSpanId(): ?string
+            public function parentSpanId(): null|string
             {
                 return null;
             }
@@ -337,7 +337,7 @@ final class SpanContextTest extends TestCase
                 return 'zzzzzzzzzzzzzzzz';
             }
 
-            public function parentSpanId(): ?string
+            public function parentSpanId(): null|string
             {
                 return null;
             }
@@ -372,7 +372,7 @@ final class SpanContextTest extends TestCase
                 return '0000000000000000';
             }
 
-            public function parentSpanId(): ?string
+            public function parentSpanId(): null|string
             {
                 return null;
             }

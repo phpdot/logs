@@ -31,7 +31,7 @@ final class SpanStack
      *
      * @return SpanInterface|null The current span.
      */
-    public function current(): ?SpanInterface
+    public function current(): null|SpanInterface
     {
         return $this->spans === [] ? null : $this->spans[array_key_last($this->spans)];
     }

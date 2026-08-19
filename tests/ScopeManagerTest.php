@@ -505,7 +505,7 @@ final class ScopeManagerTest extends TestCase
                 return isset($this->store[$id]);
             }
 
-            public function get(string $id): ?object
+            public function get(string $id): null|object
             {
                 return $this->store[$id] ?? null;
             }
@@ -545,7 +545,7 @@ final class ScopeManagerTest extends TestCase
                 return isset($this->store[$id]);
             }
 
-            public function get(string $id): ?object
+            public function get(string $id): null|object
             {
                 return $this->store[$id] ?? null;
             }

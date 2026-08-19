@@ -57,9 +57,9 @@ final class CoreSpanTest extends TestCase
             /** @var list<SpanInterface> */
             public array $deactivated = [];
 
-            public ?SpanInterface $currentSpan = null;
+            public null|SpanInterface $currentSpan = null;
 
-            public function current(): ?SpanInterface
+            public function current(): null|SpanInterface
             {
                 return $this->currentSpan;
             }
@@ -83,7 +83,7 @@ final class CoreSpanTest extends TestCase
         ScopeManagerInterface $scope,
         SpanKind $kind = SpanKind::Internal,
         string $channel = 'app',
-        ?SpanContextInterface $context = null,
+        null|SpanContextInterface $context = null,
         string $name = 'test.span',
     ): CoreSpan {
         return new CoreSpan(

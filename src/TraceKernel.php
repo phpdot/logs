@@ -63,8 +63,8 @@ final class TraceKernel
      */
     public function startRequest(
         string $name,
-        ?string $traceparent = null,
-        ?string $tracestate = null,
+        null|string $traceparent = null,
+        null|string $tracestate = null,
     ): SpanInterface {
         $span = new CoreSpan(
             $this->rootContext($traceparent, $tracestate),
@@ -109,8 +109,8 @@ final class TraceKernel
     public function handle(
         string $name,
         callable $work,
-        ?string $traceparent = null,
-        ?string $tracestate = null,
+        null|string $traceparent = null,
+        null|string $tracestate = null,
     ): mixed {
         $this->startRequest($name, $traceparent, $tracestate);
 
@@ -135,7 +135,7 @@ final class TraceKernel
      *
      * @return SpanContext The root span context.
      */
-    private function rootContext(?string $traceparent, ?string $tracestate): SpanContext
+    private function rootContext(null|string $traceparent, null|string $tracestate): SpanContext
     {
         if ($traceparent !== null && $traceparent !== '') {
             try {

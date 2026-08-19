@@ -52,7 +52,7 @@ final class ScopeManager implements ScopeManagerInterface
      *
      * @return ?SpanInterface
      */
-    public function current(): ?SpanInterface
+    public function current(): null|SpanInterface
     {
         return $this->stack()->current();
     }

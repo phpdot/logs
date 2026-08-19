@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-
 /**
  * @author Omar Hamdan <omar@phpdot.com>
  * @license MIT

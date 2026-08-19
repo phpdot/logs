@@ -34,7 +34,7 @@ final class SpanContext implements SpanContextInterface
     private function __construct(
         private readonly string $traceId,
         private readonly string $spanId,
-        private readonly ?string $parentSpanId,
+        private readonly null|string $parentSpanId,
         private readonly bool $sampled,
         private readonly string $traceState,
     ) {}
@@ -90,7 +90,7 @@ final class SpanContext implements SpanContextInterface
      *
      * @return self The decoded remote span context.
      */
-    public static function fromTraceparent(string $header, ?string $traceState = null): self
+    public static function fromTraceparent(string $header, null|string $traceState = null): self
     {
         $parent = Traceparent::parse($header, $traceState ?? '');
 
@@ -128,7 +128,7 @@ final class SpanContext implements SpanContextInterface
      *
      * @return string|null 16 hex characters, or null.
      */
-    public function parentSpanId(): ?string
+    public function parentSpanId(): null|string
     {
         return $this->parentSpanId;
     }
