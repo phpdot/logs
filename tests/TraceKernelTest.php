@@ -159,18 +159,72 @@ final class TraceKernelTest extends TestCase
     }
 
     #[Test]
-    public function handleLeavesTheStatusUnsetOnSuccess(): void
+    public function handleMarksTheRootOkOnSuccess(): void
     {
-        // The kernel never marks a successful root 'ok' — it stays at the OTel
-        // default 'unset'. This documents that contract.
+        // A clean request must be distinguishable from a failed one in the output:
+        // the kernel stamps 'ok' on the root, never leaving it at the default.
         $writer = $this->writer();
         $kernel = new TraceKernel($this->scope(), $writer);
 
         $kernel->handle('op', static fn(): string => 'ok');
 
         self::assertCount(1, $writer->records);
-        self::assertSame('unset', $writer->records[0]['status']);
+        self::assertSame('ok', $writer->records[0]['status']);
         self::assertSame('', $writer->records[0]['status_message']);
+    }
+
+    #[Test]
+    public function handlePreservesAnExplicitStatusOnSuccess(): void
+    {
+        // The engine only stamps spans still 'unset' — a status $work set on
+        // purpose (here 'error' despite returning) is the caller's verdict.
+        $writer = $this->writer();
+        $scope  = $this->scope();
+        $kernel = new TraceKernel($scope, $writer);
+
+        $kernel->handle('op', static function () use ($scope): string {
+            $scope->current()->setStatus('error', 'failed by contract');
+
+            return 'done anyway';
+        });
+
+        self::assertSame('error', $writer->records[0]['status']);
+        self::assertSame('failed by contract', $writer->records[0]['status_message']);
+    }
+
+    #[Test]
+    public function handleMarksBothTheLeakedChildAndTheRootOnThrow(): void
+    {
+        // A leaked child records where the failure happened; the root records
+        // that the request failed — neither stays 'unset'.
+        $writer = $this->writer();
+        $scope  = $this->scope();
+        $kernel = new TraceKernel($scope, $writer);
+
+        try {
+            $kernel->handle('op', static function () use ($scope, $writer): never {
+                $scope->activate(
+                    new \PHPdot\Logs\CoreSpan(
+                        \PHPdot\Logs\Trace\SpanContext::root(),
+                        'leaked.child',
+                        \PHPdot\Logs\Enum\SpanKind::Internal,
+                        $writer,
+                        $scope,
+                    ),
+                );
+
+                throw new \RuntimeException('boom');
+            });
+        } catch (\RuntimeException) {
+        }
+
+        $statuses = [];
+        foreach ($writer->records as $record) {
+            $statuses[$record['name']] = $record['status'];
+        }
+
+        self::assertSame('error', $statuses['leaked.child'], 'innermost open span is marked where it threw');
+        self::assertSame('error', $statuses['op'], 'the root records the request failure');
     }
 
     #[Test]

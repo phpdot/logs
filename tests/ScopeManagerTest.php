@@ -611,6 +611,11 @@ final class ScopeManagerTest extends TestCase
                 return $this;
             }
 
+            public function status(): string
+            {
+                return 'unset';
+            }
+
             public function context(): SpanContextInterface
             {
                 throw new \LogicException('fake span has no trace identity');
@@ -626,12 +631,32 @@ final class ScopeManagerTest extends TestCase
                 return $this->pendingNoop();
             }
 
+            public function notice(string $message, array $context = []): PendingLogInterface
+            {
+                return $this->pendingNoop();
+            }
+
             public function warning(string $message, array $context = []): PendingLogInterface
             {
                 return $this->pendingNoop();
             }
 
             public function error(string $message, array $context = []): PendingLogInterface
+            {
+                return $this->pendingNoop();
+            }
+
+            public function critical(string $message, array $context = []): PendingLogInterface
+            {
+                return $this->pendingNoop();
+            }
+
+            public function alert(string $message, array $context = []): PendingLogInterface
+            {
+                return $this->pendingNoop();
+            }
+
+            public function emergency(string $message, array $context = []): PendingLogInterface
             {
                 return $this->pendingNoop();
             }

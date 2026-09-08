@@ -243,18 +243,34 @@ final class CoreTracerTest extends TestCase
     }
 
     #[Test]
-    public function traceLeavesASuccessfulSpanStatusUnset(): void
+    public function traceMarksASuccessfulSpanOk(): void
     {
         $writer = $this->writer();
         $tracer = new CoreTracer($this->scope(), $writer);
 
-        // The contract only mandates marking 'error' on throw; success stays 'unset'.
+        // The contract stamps the outcome both ways: 'ok' on a clean return,
+        // 'error' on throw — an explicit setStatus is never overwritten.
         $tracer->trace('ok', 'internal', static fn(): bool => true);
 
         $spans = $this->spansIn($writer->records);
         self::assertCount(1, $spans);
-        self::assertSame('unset', $spans[0]['status']);
+        self::assertSame('ok', $spans[0]['status']);
         self::assertSame('', $spans[0]['status_message']);
+    }
+
+    #[Test]
+    public function tracePreservesAnExplicitStatusOnSuccess(): void
+    {
+        $writer = $this->writer();
+        $tracer = new CoreTracer($this->scope(), $writer);
+
+        $tracer->trace('marked', 'internal', static function (SpanInterface $span): void {
+            $span->setStatus('error', 'failed by contract');
+        });
+
+        $spans = $this->spansIn($writer->records);
+        self::assertSame('error', $spans[0]['status'], 'the caller set the verdict; the engine does not stamp over it');
+        self::assertSame('failed by contract', $spans[0]['status_message']);
     }
 
     #[Test]
@@ -354,7 +370,8 @@ final class CoreTracerTest extends TestCase
     }
 
     // ---------------------------------------------------------------------
-    // debug() / info() / warning() / error()
+    // debug() / info() / notice() / warning() / error() / critical() /
+    // alert() / emergency() — the full PSR-3 vocabulary
     // ---------------------------------------------------------------------
 
     /**
@@ -363,10 +380,14 @@ final class CoreTracerTest extends TestCase
     public static function logLevelProvider(): array
     {
         return [
-            'debug'   => ['debug', 'debug'],
-            'info'    => ['info', 'info'],
-            'warning' => ['warning', 'warning'],
-            'error'   => ['error', 'error'],
+            'debug'     => ['debug', 'debug'],
+            'info'      => ['info', 'info'],
+            'notice'    => ['notice', 'notice'],
+            'warning'   => ['warning', 'warning'],
+            'error'     => ['error', 'error'],
+            'critical'  => ['critical', 'critical'],
+            'alert'     => ['alert', 'alert'],
+            'emergency' => ['emergency', 'emergency'],
         ];
     }
 

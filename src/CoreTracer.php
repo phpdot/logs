@@ -129,7 +129,13 @@ final class CoreTracer implements TracerInterface
         $span = $this->span($name, $kind);
 
         try {
-            return $callback($span);
+            $result = $callback($span);
+
+            if ($span->status() === SpanStatus::Unset->value) {
+                $span->setStatus(SpanStatus::Ok->value);
+            }
+
+            return $result;
         } catch (\Throwable $error) {
             $span->setStatus(SpanStatus::Error->value, $error->getMessage());
 
@@ -166,6 +172,19 @@ final class CoreTracer implements TracerInterface
     }
 
     /**
+     * Write a notice-level line correlated to the current span.
+     *
+     * @param array<string, mixed> $context
+     * @param string $message
+     *
+     * @return PendingLogInterface
+     */
+    public function notice(string $message, array $context = []): PendingLogInterface
+    {
+        return $this->writeLog('notice', $message, $context);
+    }
+
+    /**
      * Write a warning-level line correlated to the current span.
      *
      * @param array<string, mixed> $context
@@ -189,6 +208,45 @@ final class CoreTracer implements TracerInterface
     public function error(string $message, array $context = []): PendingLogInterface
     {
         return $this->writeLog('error', $message, $context);
+    }
+
+    /**
+     * Write a critical-level line correlated to the current span.
+     *
+     * @param array<string, mixed> $context
+     * @param string $message
+     *
+     * @return PendingLogInterface
+     */
+    public function critical(string $message, array $context = []): PendingLogInterface
+    {
+        return $this->writeLog('critical', $message, $context);
+    }
+
+    /**
+     * Write an alert-level line correlated to the current span.
+     *
+     * @param array<string, mixed> $context
+     * @param string $message
+     *
+     * @return PendingLogInterface
+     */
+    public function alert(string $message, array $context = []): PendingLogInterface
+    {
+        return $this->writeLog('alert', $message, $context);
+    }
+
+    /**
+     * Write an emergency-level line correlated to the current span.
+     *
+     * @param array<string, mixed> $context
+     * @param string $message
+     *
+     * @return PendingLogInterface
+     */
+    public function emergency(string $message, array $context = []): PendingLogInterface
+    {
+        return $this->writeLog('emergency', $message, $context);
     }
 
     /**

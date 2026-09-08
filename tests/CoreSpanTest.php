@@ -182,13 +182,15 @@ final class CoreSpanTest extends TestCase
         $context = SpanContext::root();
         $span    = $this->makeSpan($writer, $this->recordingScope(), channel: 'auth', context: $context);
 
-        foreach (['debug', 'info', 'warning', 'error'] as $i => $level) {
+        $levels = ['debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert', 'emergency'];
+
+        foreach ($levels as $i => $level) {
             $span->{$level}("message-{$level}", ['idx' => $i]);
         }
 
-        self::assertCount(4, $writer->records);
+        self::assertCount(count($levels), $writer->records);
 
-        foreach (['debug', 'info', 'warning', 'error'] as $i => $level) {
+        foreach ($levels as $i => $level) {
             $record = $writer->records[$i];
 
             self::assertSame('log', $record['type']);
@@ -297,6 +299,12 @@ final class CoreSpanTest extends TestCase
         self::assertSame(['db.system' => 'mysql'], $record['attributes']);
     }
 
+    /**
+     * The delta sits above float noise rather than being tightened to taste: started_at
+     * and ended_at are unix-epoch doubles near 1.8e9, where one ULP is roughly 0.00024 ms,
+     * so recomputing the duration by subtracting them carries error that a 0.001 ms delta
+     * cannot absorb. A genuine mismatch would exceed this by orders of magnitude.
+     */
     #[Test]
     public function endSpanRecordHasMonotonicFloatTimestamps(): void
     {
@@ -315,7 +323,7 @@ final class CoreSpanTest extends TestCase
         self::assertEqualsWithDelta(
             ($record['ended_at'] - $record['started_at']) * 1000.0,
             $record['duration_ms'],
-            0.0001,
+            0.01,
         );
     }
 

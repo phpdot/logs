@@ -44,6 +44,15 @@ final class CoreSpan implements SpanInterface
     private SpanStatus $status = SpanStatus::Unset;
     private string $statusDescription = '';
     private readonly float $startedAt;
+
+    /**
+     * Monotonic start mark — the duration delta is measured on this clock, so
+     * a wall-clock step (an NTP correction mid-request) can never produce a
+     * negative or wild duration. The exported stamps stay wall-clock epoch
+     * floats; only the delta is monotonic.
+     */
+    private readonly int $startedHr;
+
     private bool $ended = false;
 
     /**
@@ -65,6 +74,7 @@ final class CoreSpan implements SpanInterface
         private readonly string $channel = 'app',
     ) {
         $this->startedAt = microtime(true);
+        $this->startedHr = hrtime(true);
     }
 
     /**
@@ -118,6 +128,16 @@ final class CoreSpan implements SpanInterface
     }
 
     /**
+     * Status.
+     *
+     * @return string
+     */
+    public function status(): string
+    {
+        return $this->status->value;
+    }
+
+    /**
      * Context.
      *
      * @return SpanContextInterface
@@ -154,6 +174,19 @@ final class CoreSpan implements SpanInterface
     }
 
     /**
+     * Write a notice-level line correlated to the current span.
+     *
+     * @param array<string, mixed> $context
+     * @param string $message
+     *
+     * @return PendingLogInterface
+     */
+    public function notice(string $message, array $context = []): PendingLogInterface
+    {
+        return $this->log('notice', $message, $context);
+    }
+
+    /**
      * Write a warning-level line correlated to the current span.
      *
      * @param array<string, mixed> $context
@@ -180,6 +213,45 @@ final class CoreSpan implements SpanInterface
     }
 
     /**
+     * Write a critical-level line correlated to the current span.
+     *
+     * @param array<string, mixed> $context
+     * @param string $message
+     *
+     * @return PendingLogInterface
+     */
+    public function critical(string $message, array $context = []): PendingLogInterface
+    {
+        return $this->log('critical', $message, $context);
+    }
+
+    /**
+     * Write an alert-level line correlated to the current span.
+     *
+     * @param array<string, mixed> $context
+     * @param string $message
+     *
+     * @return PendingLogInterface
+     */
+    public function alert(string $message, array $context = []): PendingLogInterface
+    {
+        return $this->log('alert', $message, $context);
+    }
+
+    /**
+     * Write an emergency-level line correlated to the current span.
+     *
+     * @param array<string, mixed> $context
+     * @param string $message
+     *
+     * @return PendingLogInterface
+     */
+    public function emergency(string $message, array $context = []): PendingLogInterface
+    {
+        return $this->log('emergency', $message, $context);
+    }
+
+    /**
      * End.
      *
      * @return void
@@ -203,7 +275,7 @@ final class CoreSpan implements SpanInterface
             'parent_span_id' => $this->context->parentSpanId(),
             'started_at'     => $this->startedAt,
             'ended_at'       => $endedAt,
-            'duration_ms'    => ($endedAt - $this->startedAt) * 1000.0,
+            'duration_ms'    => (hrtime(true) - $this->startedHr) / 1e6,
             'status'         => $this->status->value,
             'status_message' => $this->statusDescription,
             'attributes'     => $this->attributes,

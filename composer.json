@@ -18,11 +18,11 @@
     ],
     "require": {
         "php": ">=8.5",
-        "phpdot/container": "^0.2",
-        "phpdot/contracts": "^0.2"
+        "phpdot/contracts": "^0.3"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.94",
+        "phpdot/container": "^0.3",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^13.0"
@@ -57,5 +57,8 @@
     "support": {
         "source": "https://github.com/phpdot/logs",
         "issues": "https://github.com/phpdot/monorepo/issues"
+    },
+    "suggest": {
+        "phpdot/container": "Autowires the container-attribute services declared in src (the attributes stay inert until reflected, so standalone consumers do not need it installed)."
     }
 }

@@ -26,8 +26,11 @@ A package holds **one** object — `TracerInterface` — and logs and opens span
 | Requirement | Constraint |
 |---|---|
 | PHP | `>= 8.5` |
-| `phpdot/contracts` | `^0.2` |
-| `phpdot/container` | `^0.2` |
+| `phpdot/contracts` | `^0.3` |
+
+`phpdot/container` is `require-dev` only (and a `suggest` entry) — the `#[Singleton]` and `#[Binds]`
+attributes in `src` stay inert until a phpdot application reflects them, so standalone consumers
+don't need it installed.
 
 ## Installation
 
@@ -218,7 +221,7 @@ The package is standalone-testable:
 
 ```bash
 composer install
-composer test        # PHPUnit (368 tests)
+composer test        # PHPUnit
 composer analyse     # PHPStan, level max + strict rules
 composer cs-check    # PHP-CS-Fixer (@PER-CS2.0)
 composer check       # all three

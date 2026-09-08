@@ -28,6 +28,7 @@ use PHPdot\Contracts\Logs\ScopeManagerInterface;
 use PHPdot\Contracts\Logs\SpanInterface;
 use PHPdot\Contracts\Logs\WriterInterface;
 use PHPdot\Logs\Enum\SpanKind;
+use PHPdot\Logs\Enum\SpanStatus;
 use PHPdot\Logs\Exception\InvalidIdentifierException;
 use PHPdot\Logs\Trace\SpanContext;
 
@@ -93,9 +94,12 @@ final class TraceKernel
     /**
      * Run an entire request inside the root span — the one call a server makes.
      *
-     * Seeds the trace (continuing an inbound `traceparent`), runs $work, marks the
-     * active span 'error' if it throws (then re-throws), and ALWAYS ends the request
-     * on the way out. Callers never close() manually.
+     * Seeds the trace (continuing an inbound `traceparent`), runs $work, and ALWAYS
+     * ends the request on the way out. Callers never close() manually. The root
+     * span carries the request's outcome: 'ok' on a clean return, 'error' when
+     * $work throws (the innermost open span is marked too, so a leaked child
+     * records where the failure happened). An explicit setStatus() by $work is
+     * never overwritten — the engine only stamps spans still 'unset'.
      *
      * @template T
      *
@@ -112,12 +116,22 @@ final class TraceKernel
         null|string $traceparent = null,
         null|string $tracestate = null,
     ): mixed {
-        $this->startRequest($name, $traceparent, $tracestate);
+        $span = $this->startRequest($name, $traceparent, $tracestate);
 
         try {
-            return $work();
+            $result = $work();
+
+            if ($span->status() === SpanStatus::Unset->value) {
+                $span->setStatus(SpanStatus::Ok->value);
+            }
+
+            return $result;
         } catch (\Throwable $error) {
-            $this->scope->current()?->setStatus('error', $error->getMessage());
+            $this->scope->current()?->setStatus(SpanStatus::Error->value, $error->getMessage());
+
+            if ($span->status() === SpanStatus::Unset->value) {
+                $span->setStatus(SpanStatus::Error->value, $error->getMessage());
+            }
 
             throw $error;
         } finally {
