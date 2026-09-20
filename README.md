@@ -26,7 +26,7 @@ A package holds **one** object — `TracerInterface` — and logs and opens span
 | Requirement | Constraint |
 |---|---|
 | PHP | `>= 8.5` |
-| `phpdot/contracts` | `^0.3` |
+| `phpdot/contracts` | `^0.4` |
 
 `phpdot/container` is `require-dev` only (and a `suggest` entry) — the `#[Singleton]` and `#[Binds]`
 attributes in `src` stay inert until a phpdot application reflects them, so standalone consumers
